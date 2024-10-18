@@ -18,7 +18,7 @@ GRID_PIXEL_SIZE = SPRITE_PIXEL_SIZE * TILE_SCALING
 
 # Movement speed of player, in pixels per frame
 PLAYER_MOVEMENT_SPEED = 20
-GRAVITY = 5
+GRAVITY = 7
 PLAYER_JUMP_SPEED = 20
 
 
@@ -123,14 +123,13 @@ class MyGame(arcade.Window):
         # Draw our score on the screen, scrolling it with the viewport
         score_text = f"Vika Score: {self.score}"
         arcade.draw_text(score_text,
-                         start_x=12,
-                         start_y=12,
+                         start_x=10,
+                         start_y=10,
                          color=arcade.csscolor.WHITE,
-                         font_size=15)
+                         font_size=18)
 
-    def update_player_speed(self):
-
- # Calculate speed based on the keys pressed
+    def update_player_speed(self): 
+  # Calculate speed based on the keys pressed
         self.player_sprite.change_x = 0
 
         if self.left_key_down and not self.right_key_down:
