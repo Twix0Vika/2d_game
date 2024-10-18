@@ -130,4 +130,89 @@ class MyGame(arcade.Window):
 
     def update_player_speed(self):
 
-        # Calculate
+ # Calculate speed based on the keys pressed
+        self.player_sprite.change_x = 0
+
+        if self.left_key_down and not self.right_key_down:
+            self.player_sprite.change_x = -PLAYER_MOVEMENT_SPEED
+        elif self.right_key_down and not self.left_key_down:
+            self.player_sprite.change_x = PLAYER_MOVEMENT_SPEED
+
+    def on_key_press(self, key, modifiers):
+        """Called whenever a key is pressed."""
+
+        # Jump
+        if key == arcade.key.UP or key == arcade.key.W:
+            if self.physics_engine.can_jump():
+                self.player_sprite.change_y = PLAYER_JUMP_SPEED
+
+        # Left
+        elif key == arcade.key.LEFT or key == arcade.key.A:
+            self.left_key_down = True
+            self.update_player_speed()
+
+        # Right
+        elif key == arcade.key.RIGHT or key == arcade.key.D:
+            self.right_key_down = True
+            self.update_player_speed()
+
+    def on_key_release(self, key, modifiers):
+        """Called when the user releases a key."""
+        if key == arcade.key.LEFT or key == arcade.key.A:
+            self.left_key_down = False
+            self.update_player_speed()
+        elif key == arcade.key.RIGHT or key == arcade.key.D:
+            self.right_key_down = False
+            self.update_player_speed()
+
+    def center_camera_to_player(self):
+        # Find where player is, then calculate lower left corner from that
+        screen_center_x = self.player_sprite.center_x - (self.camera_sprites.viewport_width / 2)
+        screen_center_y = self.player_sprite.center_y - (self.camera_sprites.viewport_height / 2)
+
+        # Set some limits on how far we scroll
+        if screen_center_x < 0:
+            screen_center_x = 0
+        if screen_center_y < 0:
+            screen_center_y = 0
+
+        # Here's our center, move to it
+        player_centered = screen_center_x, screen_center_y
+        self.camera_sprites.move_to(player_centered)
+
+    def on_update(self, delta_time):
+        """Movement and game logic"""
+
+        # Move the player with the physics engine
+        self.physics_engine.update()
+
+        # See if we hit any coins
+        coin_hit_list = arcade.check_for_collision_with_list(
+            self.player_sprite, self.scene["Coins"]
+        )
+
+        # Loop through each coin we hit (if any) and remove it
+        for coin in coin_hit_list:
+            # Remove the coin
+            coin.remove_from_sprite_lists()
+            # Add one to the score
+            self.score += 1
+
+        # Position the camera
+        self.center_camera_to_player()
+
+    def on_resize(self, width, height):
+        """ Resize window """
+        self.camera_sprites.resize(int(width), int(height))
+        self.camera_gui.resize(int(width), int(height))
+
+
+def main():
+    """Main function"""
+    window = MyGame()
+    window.setup()
+    arcade.run()
+
+
+if name == "main":
+    main()      
